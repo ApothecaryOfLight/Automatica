@@ -30,6 +30,7 @@ end
 minetest.register_node( "automatica:dev_conveyor_belt", {
 	description = "conveyor Belt (dev)",
 	drawtype = "mesh",
+	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propogates = true,
 	groups = { cracky = 3; choppy = 1; punch_operable = 1 },
@@ -121,6 +122,7 @@ minetest.register_node( "automatica:dev_conveyor_belt", {
 minetest.register_node( "automatica:dev_conveyor_slope_up", {
 	description = "conveyor Belt Slope Up (dev)",
 	drawtype = "mesh",
+	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propogates = true,
 	groups = { cracky = 3; choppy = 1; punch_operable = 1 },
@@ -154,7 +156,7 @@ minetest.register_node( "automatica:dev_conveyor_slope_up", {
 		--end
 
 		local myObjects = minetest.get_objects_inside_radius( newPos, .5 )
-		if myObjects ~= nil and #myObjects >= .5 then
+		if myObjects ~= nil and #myObjects >= 1 then
 			for i=1, #myObjects do
 				local myName = myObjects[i]:get_player_name()
 				local myVelocity = myObjects[i]:get_velocity() or
@@ -163,9 +165,12 @@ minetest.register_node( "automatica:dev_conveyor_slope_up", {
 				local myDir = myMeta:get_int( "dir" )
 				local myAddingVelocity = {
 					x = 0,
-					y = -3,
+					y = 3,
 					z = 0
 				}
+				if myVelocity.y < 0 then
+					myAddingVelocity.y = myAddingVelocity.y + (myVelocity.y * -1)
+				end
 				if myDir == 0 then
 					myAddingVelocity.x = .7
 				elseif myDir == 1 then
@@ -181,7 +186,7 @@ minetest.register_node( "automatica:dev_conveyor_slope_up", {
 					) or myObjects[i]:add_player_velocity(
 						{
 							x = myAddingVelocity.x*4,
-							y = -3,
+							y = 3,
 							z = myAddingVelocity.z*4
 						}
 					)
