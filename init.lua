@@ -29,9 +29,22 @@ end
 
 minetest.register_node( "automatica:dev_conveyor_belt", {
 	description = "conveyor Belt (dev)",
-	drawtype = "drawtype",
+	drawtype = "mesh",
 	paramtype2 = "facedir",
-	tiles = { {
+	sunlight_propogates = true,
+	collision_box = {
+		type = "fixed",
+		fixed = {
+			 { -0.5, -0.5, -0.5, .5, 0, .5 },
+		},
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			 { -0.5, -0.5, -0.5, .5, 0, .5 },
+		},
+	},
+	--[[tiles = { {
 		name = "conveyor_belt.png",
 		animation = {
 			type = "vertical_frames",
@@ -39,10 +52,12 @@ minetest.register_node( "automatica:dev_conveyor_belt", {
 			aspect_h = 16,
 			length = 0.5,
 		},
-	} },
+	} },]]
+	visual_scale = "mesh",
+	mesh = "conveyor_mid.b3d",
 	on_timer = function ( pos, elapsed )
 		--print( "On Timer" )
-		local newPos = { x = pos.x, y = pos.y+1, z = pos.z }
+		local newPos = { x = pos.x, y = pos.y, z = pos.z }
 		local myNodeAbove = minetest.get_node( newPos )
 		--if myNodeAbove.name == "air" then
 			--print( myNodeAbove.name )
@@ -59,7 +74,7 @@ minetest.register_node( "automatica:dev_conveyor_belt", {
 				local myDir = myMeta:get_int( "dir" )
 				local myAddingVelocity = {
 					x = 0,
-					y = -1,
+					y = -3,
 					z = 0
 				}
 				if myDir == 0 then
@@ -83,6 +98,48 @@ minetest.register_node( "automatica:dev_conveyor_belt", {
 					)
 				end
 			end
+		end
+		local myPlayers = minetest.get_objects_inside_radius( newPos, .6 )
+		--print( "[automatica] Player test." )
+		--print( dump( myPlayers ) )
+		--print( #myPlayers )
+		if myPlayers ~= nil and #myPlayers >= 1 then
+			print( "[automatica] Has players." )
+			for i=1, #myPlayers do
+				local myVelocity = myPlayers[i]:get_player_velocity()
+				print( "myVelocity: " )
+				print( myVelocity )
+				if myVelocity ~= nil then
+					print( "[automatica] Player to move." )
+					local myMeta = minetest.get_meta( pos )
+					local myDir = myMeta:get_int( "dir" )
+					local myAddingVelocity = {
+						x = 0,
+						y = 0,
+						z = 0
+					}
+					if myDir == 0 then
+						myAddingVelocity.x = 1
+					elseif myDir == 1 then
+						myAddingVelocity.z = -1
+					elseif myDir == 2 then
+						myAddingVelocity.x = -1
+					elseif myDir == 3 then
+						myAddingVelocity.z = 1
+					end
+					if myVelocity.z+myVelocity.x < 4 then
+						print( "[automatica] Adding velocity to player." )
+						local done = myPlayers[i]:add_player_velocity(
+							{
+								x = myAddingVelocity.x*3,
+								y = -1,
+								z = myAddingVelocity.z*3
+							}
+						)
+					end
+				end
+			end
+
 		end
 		minetest.get_node_timer( pos ):set( 1, 1 )
 	end,
