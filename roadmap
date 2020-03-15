@@ -38,17 +38,14 @@ MACHINES:
 
 CONVEYOR BELTS
 	I
-		Brown Belts
+		Brown Belts/Splitters/Mergers/Fitlers/Ends/Turns
 		Windmill/Waterwheel Mechanical Power Adapter
-		Brown Splitter
-		Brown Merger
-		Brown Filter
 		Item Pump - Removes items from containers and places them on conveyor belts
 		Inserter - Inserts items into containers from conveyor belts
 	II
-		Blue Belts
+		Blue Belts/Splitters/Mergers/Fitlers/Ends/Turns
 	III
-		Gold Belts
+		Gold Belts/Splitters/Mergers/Fitlers/Ends/Turns
 
 
 PIPES
