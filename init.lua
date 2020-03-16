@@ -108,6 +108,93 @@ minetest.register_node( "automatica:dev_conveyor_belt", {
 	end,
 })
 
+local conveyor_turn_collisions = {
+	{ -0.4, -0.5, -0.56, .4, -0.12, .56 },
+	{ 0.5, -0.5, -0.56, .4, 0.2, .56 },
+	{ 0.5, -0.5, 0.5, -0.5, 0.2, .4 }
+}
+minetest.register_node( "automatica:dev_conveyor_turn", {
+	description = "conveyor Belt Turn(dev)",
+	drawtype = "mesh",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propogates = true,
+	groups = { cracky = 3; choppy = 1; punch_operable = 1 },
+	collision_box = {
+		type = "fixed",
+		fixed = conveyor_turn_collisions
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = conveyor_turn_collisions
+	},
+	node_box = {
+		type = "fixed",
+		fixed = conveyor_turn_collisions
+	},
+	visual_scale = "mesh",
+	mesh = "dev_conveyor_turn.b3d",
+	on_timer = function ( pos, elapsed )
+		--print( "On Timer" )
+		local newPos = { x = pos.x, y = pos.y, z = pos.z }
+		local myNodeAbove = minetest.get_node( newPos )
+		local myObjects = minetest.get_objects_inside_radius( newPos, .5 )
+		if myObjects ~= nil and #myObjects >= .5 then
+			for i=1, #myObjects do
+				local myName = myObjects[i]:get_player_name()
+				local myVelocity = myObjects[i]:get_velocity() or
+					myObjects[i]:get_player_velocity()
+				local myMeta = minetest.get_meta( pos )
+				local myDir = myMeta:get_int( "dir" )
+				local myAddingVelocity = {
+					x = 0,
+					y = -3,
+					z = 0
+				}
+				if myDir == 1 then
+					myAddingVelocity.x = .7
+				elseif myDir == 2 then
+					myAddingVelocity.z = -0.7
+				elseif myDir == 3 then
+					myAddingVelocity.x = -0.7
+				elseif myDir == 0 then
+					myAddingVelocity.z = .7
+				end
+				if math.abs(myVelocity.z)+math.abs(myVelocity.x) < 0.5 then
+					local done = myObjects[i]:add_velocity(
+						myAddingVelocity
+					) --[[or myObjects[i]:add_player_velocity(
+						{
+							x = myAddingVelocity.x*4,
+							y = -3,
+							z = myAddingVelocity.z*4
+						}
+					)]]
+				end
+			end
+		end
+		minetest.get_node_timer( pos ):set( 0.1, 0 )
+	end,
+	after_place_node = function ( pos, placer, itemstack, pointed_thing )
+		print( "After place" )
+
+		local dir = placer:get_look_dir()
+		local myDir = get_dir( dir )
+		local myMeta = minetest.get_meta( pos )
+		myMeta:set_int( "dir", myDir )
+
+		minetest.get_node_timer( pos ):set( 0.1, 0 )
+	end,
+	on_place = function( itemstack, placer, pointed_thing )
+		return do_rotation( itemstack, placer, pointed_thing )
+	end,
+	on_punch = function( pos, node, puncher, pointed_thing )
+		print( "on_punch" )
+		print( dump( node ) )
+	end,
+})
+
+
 minetest.register_node( "automatica:dev_conveyor_end", {
 	description = "Conveyor Belt End (dev)",
 	drawtype = "mesh",
