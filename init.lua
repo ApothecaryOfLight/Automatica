@@ -22,6 +22,11 @@ local function do_rotation( itemstack, placer, pointed_thing )
 	return minetest.item_place( itemstack, placer, pointed_thing, param2 )
 end
 
+local conveyor_collisions = {
+	{ -0.4, -0.5, -0.56, .4, -0.12, .56 },
+	{ -0.5, -0.5, -0.56, -0.4, 0, .56 },
+	{ 0.5, -0.5, -0.56, .4, 0, .56 }
+}
 minetest.register_node( "automatica:dev_conveyor_belt", {
 	description = "conveyor Belt (dev)",
 	drawtype = "mesh",
@@ -31,21 +36,15 @@ minetest.register_node( "automatica:dev_conveyor_belt", {
 	groups = { cracky = 3; choppy = 1; punch_operable = 1 },
 	collision_box = {
 		type = "fixed",
-		fixed = {
-			 { -0.5, -0.5, -0.5, .5, 0, .5 },
-		},
+		fixed = conveyor_collisions
 	},
 	selection_box = {
 		type = "fixed",
-		fixed = {
-			 { -0.5, -0.5, -0.5, .5, 0, .5 },
-		},
+		fixed = conveyor_collisions
 	},
 	node_box = {
 		type = "fixed",
-		fixed = {
-			 { -0.5, -0.5, -0.5, .5, 0, .5 },
-		},
+		fixed = conveyor_collisions
 	},
 	visual_scale = "mesh",
 	mesh = "dev_conveyor_mid.b3d",
