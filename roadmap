@@ -20,10 +20,12 @@ MATERIALS:
 	I
 		Rubber, Iron
 	II
-		Plastic (from greenery, fuel)
+		Invar
+		Electrum (for eletronics)
 		Silicon (for transistors)
 		Gems ranks I and II (speed diff, color=type)
 	III
+		Plastic (from greenery, fuel)
 		Voidsphere
 		Gems rank III
 
@@ -33,7 +35,9 @@ MACHINES:
 		Unpowered Autocrafter
 		Mechanical Autocrafter
 	II
-		Powered Autocrafter
+		Powered Autocrafter - Electrum, Invar
+	III
+		High Speed Autocrafter - Titanium + Chromium
 
 
 CONVEYOR BELTS
@@ -50,9 +54,42 @@ CONVEYOR BELTS
 
 PIPES
 	II
-		Item Pipes
-		Liquid Pipes
-		Liquid Pump
-		Liquid Injector
+		Liquid/Gas Pipes
+		Liquid/Gas Pump
+		Liquid/Gas Injector
+		Liquid/Gas Extractor
+	III
+		High Speed Pipes
+		High Speed Pump
+		High Speed Injector
 
+EMITTER SYSTEM
+	III
+		Emitter Hub
+		Requester Chest
+		Supplier Chest
+
+PLASTIC
+	I
+		Turpentine -> Camphor
+		Camphor + Nitrocellulose -> Celluloid
+		Celluloid + Dye + Alochol -> Shaped Plastic Parts
 ]]--
+
+
+connection system
+-defined by possible connections
+-will always be units of transportation
+-will be composed of object vectors grouped by connectors
+-connectors will be grouped by systems
+-each system will be held by reference in a collection
+
+	-> conveyor belts
+	-> electricity
+	-> pipes for liquids/gases
+	-> pipes for items
+
+multiblock system
+-define by schematics and dimensions
+-blocks and their formspecs?
+-inventories being linked? / input/output blocks
