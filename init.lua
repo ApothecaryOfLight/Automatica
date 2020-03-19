@@ -23,9 +23,9 @@ local function do_rotation( itemstack, placer, pointed_thing )
 end
 
 local conveyor_collisions = {
-	{ -0.4, -0.5, -0.56, .4, -0.12, .56 },
-	{ -0.5, -0.5, -0.56, -0.4, 0, .56 },
-	{ 0.5, -0.5, -0.56, .4, 0, .56 }
+	{ -0.4, -0.5, -0.56, .4, -0.26, .56 },
+	{ -0.5, -0.5, -0.56, -0.6, 0.2, .56 },
+	{ 0.5, -0.5, -0.56, .6, 0.2, .56 }
 }
 minetest.register_node( "automatica:dev_conveyor_belt", {
 	description = "conveyor Belt (dev)",
@@ -52,14 +52,40 @@ minetest.register_node( "automatica:dev_conveyor_belt", {
 		--print( "On Timer" )
 		local newPos = { x = pos.x, y = pos.y, z = pos.z }
 		local myNodeAbove = minetest.get_node( newPos )
-		local myObjects = minetest.get_objects_inside_radius( newPos, .5 )
-		if myObjects ~= nil and #myObjects >= .5 then
+		local myObjects = minetest.get_objects_inside_radius( newPos, .75 )
+		if myObjects ~= nil and #myObjects >= 1 then
+			--local myStoredObjects = {}
 			for i=1, #myObjects do
+				--print( dump( getmetatable( myObjects[i]:get_luaentity().object ) ) )
+				--myStoredObjects[i] = myObjects[i]
 				local myName = myObjects[i]:get_player_name()
 				local myVelocity = myObjects[i]:get_velocity() or
 					myObjects[i]:get_player_velocity()
+				local myPos = myObjects[i]:get_pos()
 				local myMeta = minetest.get_meta( pos )
 				local myDir = myMeta:get_int( "dir" )
+
+				--[[print( "======> BELT POS" )
+				print( dump( pos ) )
+				print( "======> OBJ VEL" )
+				print( dump( myVelocity ) )
+				print( "======> OBJ POS" )
+				print( dump( myPos ) )]]
+
+				if pos.y+.5 < myPos.y or
+					pos.x+1 > myPos.x or pos.X-1 < myPos.x or
+					pos.z+1 > myPos.z or pos.Z-1 < myPos.z then
+					if math.abs( myVelocity.x ) + math.abs( myVelocity.z ) == 0 then
+						print( "Jammed object!" )
+						--if myStoredObjects[ (myPos.x*30000)+myPos.z ] ~= nil then
+						myObjects[i]:set_pos( { x = pos.x, y = pos.y, z = pos.z } )
+						--	myStoredObjects[ (myPos.x * 30000)+myPos.z ] = nil
+						--else
+						--	myStoredObjects[ (myPos.x * 30000)+myPos.z ] = myObjects[i]
+						--end
+					end
+				end
+
 				local myAddingVelocity = {
 					x = 0,
 					y = -3,
@@ -109,9 +135,9 @@ minetest.register_node( "automatica:dev_conveyor_belt", {
 })
 
 local conveyor_turn_collisions = {
-	{ -0.4, -0.5, -0.56, .4, -0.12, .56 },
-	{ 0.5, -0.5, -0.56, .4, 0.2, .56 },
-	{ 0.5, -0.5, 0.5, -0.5, 0.2, .4 }
+	{ -0.6, -0.5, -0.56, .6, -0.26, .56 },
+	{ 0.5, -0.5, -0.56, .6, 0.2, .56 },
+	{ 0.5, -0.5, 0.56, -0.6, 0.2, .4 }
 }
 minetest.register_node( "automatica:dev_conveyor_turn", {
 	description = "conveyor Belt Turn(dev)",
@@ -138,14 +164,33 @@ minetest.register_node( "automatica:dev_conveyor_turn", {
 		--print( "On Timer" )
 		local newPos = { x = pos.x, y = pos.y, z = pos.z }
 		local myNodeAbove = minetest.get_node( newPos )
-		local myObjects = minetest.get_objects_inside_radius( newPos, .5 )
-		if myObjects ~= nil and #myObjects >= .5 then
+		local myObjects = minetest.get_objects_inside_radius( newPos, .75 )
+		if myObjects ~= nil and #myObjects >= 1 then
 			for i=1, #myObjects do
 				local myName = myObjects[i]:get_player_name()
 				local myVelocity = myObjects[i]:get_velocity() or
 					myObjects[i]:get_player_velocity()
 				local myMeta = minetest.get_meta( pos )
 				local myDir = myMeta:get_int( "dir" )
+
+
+
+				local myPos = myObjects[i]:get_pos()
+				if pos.y+.5 < myPos.y or
+					pos.x+1 > myPos.x or pos.X-1 < myPos.x or
+					pos.z+1 > myPos.z or pos.Z-1 < myPos.z then
+					if math.abs( myVelocity.x ) + math.abs( myVelocity.z ) == 0 then
+						print( "Jammed object!" )
+						--if myStoredObjects[ (myPos.x*30000)+myPos.z ] ~= nil then
+						myObjects[i]:set_pos( { x = pos.x, y = pos.y, z = pos.z } )
+						--	myStoredObjects[ (myPos.x * 30000)+myPos.z ] = nil
+						--else
+						--	myStoredObjects[ (myPos.x * 30000)+myPos.z ] = myObjects[i]
+						--end
+					end
+				end
+
+
 				local myAddingVelocity = {
 					x = 0,
 					y = -3,
@@ -163,13 +208,13 @@ minetest.register_node( "automatica:dev_conveyor_turn", {
 				if math.abs(myVelocity.z)+math.abs(myVelocity.x) < 0.5 then
 					local done = myObjects[i]:add_velocity(
 						myAddingVelocity
-					) --[[or myObjects[i]:add_player_velocity(
+					) or myObjects[i]:add_player_velocity(
 						{
 							x = myAddingVelocity.x*4,
 							y = -3,
 							z = myAddingVelocity.z*4
 						}
-					)]]
+					)
 				end
 			end
 		end
@@ -225,8 +270,8 @@ minetest.register_node( "automatica:dev_conveyor_end", {
 	on_timer = function ( pos, elapsed )
 		local newPos = { x = pos.x, y = pos.y, z = pos.z }
 		local myNodeAbove = minetest.get_node( newPos )
-		local myObjects = minetest.get_objects_inside_radius( newPos, .5 )
-		if myObjects ~= nil and #myObjects >= .5 then
+		local myObjects = minetest.get_objects_inside_radius( newPos, .75 )
+		if myObjects ~= nil and #myObjects >= 1 then
 			for i=1, #myObjects do
 				local myName = myObjects[i]:get_player_name()
 				local myVelocity = myObjects[i]:get_velocity() or
@@ -301,7 +346,7 @@ minetest.register_node( "automatica:dev_conveyor_ladder_up", {
 		local newPos = { x = pos.x, y = pos.y, z = pos.z }
 		local myNodeAbove = minetest.get_node( newPos )
 
-		local myObjects = minetest.get_objects_inside_radius( newPos, .5 )
+		local myObjects = minetest.get_objects_inside_radius( newPos, .75 )
 		if myObjects ~= nil and #myObjects >= 1 then
 			for i=1, #myObjects do
 				--local myName = myObjects[i]:get_player_name()
@@ -340,7 +385,7 @@ minetest.register_node( "automatica:dev_conveyor_ladder_up", {
 			end
 		end
 		local abovePos = { x = pos.x, y = pos.y+1, z = pos.z }
-		local myObjectsAbove = minetest.get_objects_inside_radius( abovePos, .5 )
+		local myObjectsAbove = minetest.get_objects_inside_radius( abovePos, .75 )
 		if myObjectsAbove ~= nil and #myObjectsAbove >= 1 then
 			for i=1, #myObjectsAbove do
 				local myMeta = minetest.get_meta( pos )
