@@ -314,9 +314,21 @@ minetest.register_node( "automatica:dev_conveyor_end", {
 	end,
 })
 
-local dev_conveyor_ladder_up_dimensions = { -0.5, -0.5, .25, 0.5, 0.5, .5 }
-minetest.register_node( "automatica:dev_conveyor_ladder_up", {
-	description = "conveyor Belt Ladder Up (dev)",
+--local dev_conveyor_ladder_up_dimensions = { -0.5, -0.5, .25, 0.5, 0.5, .5 }
+local dev_conveyor_ladder_up_dimensions = {
+	{ -0.5, -0.5, -0.5, 	0.5, -0.45, -0.4 },
+	{ -0.5, -0.45, -0.4, 	0.5, -0.35, -0.3 },
+	{ -0.5, -0.35, -0.3, 	0.5, -0.25, -0.2 },
+	{ -0.5, -0.25, -0.2, 	0.5, -0.15, -0.1 },
+	{ -0.5, -0.15, -0.1, 	0.5, -0.05, 0.0 },
+	{ -0.5, 0.05, 0.0, 	0.5, 0.15, 0.1 },
+	{ -0.5, 0.15, 0.1, 	0.5, 0.25, 0.2 },
+	{ -0.5, 0.25, 0.2, 	0.5, 0.35, 0.3 },
+	{ -0.5, 0.35, 0.3, 	0.5, 0.45, 0.4 },
+	{ -0.5, 0.45, 0.4, 	0.5, 0.5, 0.5 },
+}
+minetest.register_node( "automatica:dev_conveyor_slope_up", {
+	description = "conveyor Belt Slope Up (dev)",
 	drawtype = "mesh",
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -324,29 +336,23 @@ minetest.register_node( "automatica:dev_conveyor_ladder_up", {
 	groups = { cracky = 3; choppy = 1; punch_operable = 1 },
 	collision_box = {
 		type = "fixed",
-		fixed = {
-			 dev_conveyor_ladder_up_dimensions,
-		},
+		fixed = dev_conveyor_ladder_up_dimensions
 	},
 	selection_box = {
 		type = "fixed",
-		fixed = {
-			 dev_conveyor_ladder_up_dimensions,
-		},
+		fixed = dev_conveyor_ladder_up_dimensions
 	},
 	node_box = {
 		type = "fixed",
-		fixed = {
-			 dev_conveyor_ladder_up_dimensions,
-		},
+		fixed = dev_conveyor_ladder_up_dimensions
 	},
 	visual_scale = "mesh",
-	mesh = "dev_conveyor_ladder_up.b3d",
+	mesh = "dev_conveyor_slope_up.b3d",
 	on_timer = function ( pos, elapsed )
 		local newPos = { x = pos.x, y = pos.y, z = pos.z }
 		local myNodeAbove = minetest.get_node( newPos )
 
-		local myObjects = minetest.get_objects_inside_radius( newPos, .75 )
+		local myObjects = minetest.get_objects_inside_radius( newPos, 1 )
 		if myObjects ~= nil and #myObjects >= 1 then
 			for i=1, #myObjects do
 				--local myName = myObjects[i]:get_player_name()
@@ -354,22 +360,41 @@ minetest.register_node( "automatica:dev_conveyor_ladder_up", {
 					myObjects[i]:get_player_velocity()
 				local myMeta = minetest.get_meta( pos )
 				local myDir = myMeta:get_int( "dir" )
+
+
+
+				local myPos = myObjects[i]:get_pos()
+				if pos.y+.5 < myPos.y or
+					pos.x+1 > myPos.x or pos.X-1 < myPos.x or
+					pos.z+1 > myPos.z or pos.Z-1 < myPos.z then
+					if math.abs( myVelocity.x ) + math.abs( myVelocity.z ) == 0 then
+						print( "Jammed object on slope!" )
+						--if myStoredObjects[ (myPos.x*30000)+myPos.z ] ~= nil then
+						myObjects[i]:set_pos( { x = pos.x, y = pos.y+1, z = pos.z } )
+						--	myStoredObjects[ (myPos.x * 30000)+myPos.z ] = nil
+						--else
+						--	myStoredObjects[ (myPos.x * 30000)+myPos.z ] = myObjects[i]
+						--end
+					end
+				end
+
+
 				local myAddingVelocity = {
 					x = 0,
-					y = 5,
+					y = 2,
 					z = 0
 				}
 				if myVelocity.y < 0 then
 					myAddingVelocity.y = myAddingVelocity.y + (myVelocity.y * -1)
 				end
 				if myDir == 0 then
-					myAddingVelocity.x = 20
+					myAddingVelocity.x = .7
 				elseif myDir == 1 then
-					myAddingVelocity.z = -20
+					myAddingVelocity.z = -.7
 				elseif myDir == 2 then
-					myAddingVelocity.x = -20
+					myAddingVelocity.x = -.7
 				elseif myDir == 3 then
-					myAddingVelocity.z = 20
+					myAddingVelocity.z = .7
 				end
 				if myVelocity.y < 5 then
 					local done = myObjects[i]:add_velocity(
@@ -377,7 +402,7 @@ minetest.register_node( "automatica:dev_conveyor_ladder_up", {
 					) or myObjects[i]:add_player_velocity(
 						{
 							x = myAddingVelocity.x*4,
-							y = 3,
+							y = 0,
 							z = myAddingVelocity.z*4
 						}
 					)
@@ -386,7 +411,7 @@ minetest.register_node( "automatica:dev_conveyor_ladder_up", {
 		end
 		local abovePos = { x = pos.x, y = pos.y+1, z = pos.z }
 		local myObjectsAbove = minetest.get_objects_inside_radius( abovePos, .75 )
-		if myObjectsAbove ~= nil and #myObjectsAbove >= 1 then
+		--[[if myObjectsAbove ~= nil and #myObjectsAbove >= 1 then
 			for i=1, #myObjectsAbove do
 				local myMeta = minetest.get_meta( pos )
 				local myDir = myMeta:get_int( "dir" )
@@ -417,7 +442,7 @@ minetest.register_node( "automatica:dev_conveyor_ladder_up", {
 					)
 				--end				
 			end
-		end
+		end]]
 		minetest.get_node_timer( pos ):set( .1, 0 )
 	end,
 	after_place_node = function ( pos, placer, itemstack, pointed_thing )
@@ -432,3 +457,6 @@ minetest.register_node( "automatica:dev_conveyor_ladder_up", {
 		return do_rotation( itemstack, placer, pointed_thing )
 	end,
 })
+
+
+
